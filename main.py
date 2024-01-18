@@ -1,8 +1,8 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from core.handlers.basic import get_start
+from aiogram.filters import CommandStart
+from core.handlers.basic import get_start, set_code
 from core.settings import settings
 
 
@@ -22,7 +22,8 @@ async def start():
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
 
-    dp.message.register(get_start)
+    dp.message.register(get_start, CommandStart(deep_link=True))
+    dp.message.register(set_code)
 
     try:
         await dp.start_polling(bot)
