@@ -14,14 +14,17 @@ async def get_start(message: Message, command: CommandObject):
 
 
 async def set_code(message: Message, code_param=None):
-    code = code_param if code_param else message.text
-    chars = string.ascii_uppercase + string.digits
+    input_code = code_param if code_param else message.text
+    valid_chars = string.ascii_uppercase + string.digits
 
-    if len(code) == 8 and all(c in chars for c in code):
+    if len(input_code) == 9 and all(c in valid_chars for c in input_code) and input_code[0] in ('S', 'T'):
+        role_map = {'S': 'student', 'T': 'tutor'}
+        role = role_map.get(input_code[0])
+        invite_code = input_code[1:]
         telegram_id = message.from_user.id
 
         response = requests.post('http://127.0.0.1:8000/api/account/set-telegram-id/',
-                                 data={'code': code, 'telegram_id': telegram_id})
+                                 data={'code': invite_code, 'role': role, 'telegram_id': telegram_id})
 
         await message.answer(text=response.json().get('message'))
         return
